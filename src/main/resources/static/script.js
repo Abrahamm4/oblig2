@@ -1,27 +1,81 @@
 function kjopBillett() {
-    const billett = {
-        film: $("#velgFilm").val(),
-        antall: $("#antall").val(),
-        fornavn: $("#navn").val(),
-        etternavn: $("#etterNavn").val(),
-        telefon: $("#telefon").val(),
-        epost: $("#epost").val()
-    };
+    // Reset previous error messages
+    $(".error-message").text("");
 
-    // Perform the necessary actions with the billett object, such as sending it to the server or processing it further.
-    // For example, you can send it using Ajax:
-    $.post("/kjopBillett", billett, function() {
-        hentAlleBilletter();
-    });
+    // Get input values
+    const film = $("#velgFilm").val();
+    const antall = $("#antall").val();
+    const fornavn = $("#navn").val();
+    const etternavn = $("#etterNavn").val();
+    const telefon = $("#telefon").val();
+    const epost = $("#epost").val();
 
-    // Clear the form fields after submission
-    $("#velgFilm").val("");
-    $("#antall").val("");
-    $("#navn").val("");
-    $("#etterNavn").val("");
-    $("#telefon").val("");
-    $("#epost").val("");
+    // Validate input
+    let isValid = true;
+
+    if (!film) {
+        $("#filmError").text("Velg en film");
+        isValid = false;
+    }
+
+    if (!antall || antall <= 0) {
+        $("#antallError").text("Angi et gyldig antall billetter");
+        isValid = false;
+    }
+
+    if (!fornavn) {
+        $("#navnError").text("Fyll inn fornavn");
+        isValid = false;
+    }
+
+    if (!etternavn) {
+        $("#etterNavnError").text("Fyll inn etternavn");
+        isValid = false;
+    }
+
+    if (!telefon) {
+        $("#telefonError").text("Fyll inn telefonnummer");
+        isValid = false;
+    } else if (!/^[0-9]{8}$/.test(telefon)) {
+        $("#telefonError").text("Ugyldig telefonnummer (8 siffer påkrevd)");
+        isValid = false;
+    }
+
+    if (!epost) {
+        $("#epostError").text("Fyll inn e-postadresse");
+        isValid = false;
+    } else if (!/^\S+@\S+\.\S+$/.test(epost)) {
+        $("#epostError").text("Ugyldig e-postadresse");
+        isValid = false;
+    }
+
+    // If all inputs are valid, proceed with ticket purchase
+    if (isValid) {
+        const billett = {
+            film: film,
+            antall: antall,
+            fornavn: fornavn,
+            etternavn: etternavn,
+            telefon: telefon,
+            epost: epost
+        };
+
+        // Perform the necessary actions with the billett object, such as sending it to the server or processing it further.
+        // For example, you can send it using Ajax:
+        $.post("/kjopBillett", billett, function() {
+            hentAlleBilletter();
+        });
+
+        // Clear the form fields after submission
+        $("#velgFilm").val("");
+        $("#antall").val("");
+        $("#navn").val("");
+        $("#etterNavn").val("");
+        $("#telefon").val("");
+        $("#epost").val("");
+    }
 }
+
 
 function hentAlleBilletter() {
     $.get("/hentAlleBilletter", function(billetter) {
